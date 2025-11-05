@@ -6,12 +6,23 @@ const cors = require('cors');
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const webAppURL = process.env.WEB_APP_URL;
+const PORT = process.env.PORT || 8000;
+const SERVER_URL = process.env.SERVER_URL;
 
-const bot = new TelegramBot(token, { polling: true });
+//const bot = new TelegramBot(token, { polling: true });
+const bot = new TelegramBot(token);
+
 const app = express();
 
 app.use(express.json());
 app.use(cors());
+
+bot.setWebHook(`${SERVER_URL}/bot${token}`);
+
+app.post(`/bot${token}`, (req, res) => {
+  bot.processUpdate(req.body);
+  res.sendStatus(200);
+});
 
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
@@ -76,7 +87,5 @@ app.post('/web-data', async (req, res) => {
   }
   return res.status(500).json();
 });
-
-const PORT = 8000;
 
 app.listen(PORT, () => console.log('server started on PORT ' + PORT));
