@@ -10,15 +10,15 @@ const webAppURL = process.env.WEB_APP_URL;
 const PORT = process.env.PORT || 8000;
 const SERVER_URL = process.env.SERVER_URL;
 
-//const bot = new TelegramBot(token, { polling: true });
-const bot = new TelegramBot(token);
+const bot = new TelegramBot(token, { polling: true });
+//const bot = new TelegramBot(token);
 
 const app = express();
 
 app.use(express.json());
 app.use(cors());
 
-bot.setWebHook(`${SERVER_URL}/bot${token}`);
+//bot.setWebHook(`${SERVER_URL}/bot${token}`);
 
 app.post(`/bot${token}`, (req, res) => {
   bot.processUpdate(req.body);
