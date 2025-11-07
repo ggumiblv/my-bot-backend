@@ -32,7 +32,7 @@ bot.on('message', async (msg) => {
   if (text === '/start') {
     await bot.sendMessage(chatId, 'Ниже появится кнопка, заполни форму', {
       reply_markup: {
-        keyboard: [[{ text: 'Сделать заказ', web_app: { url: webAppURL + 'form' } }]]
+        keyboard: [[{ text: 'Заполни меня', web_app: { url: webAppURL + 'form' } }]]
       }
     });
 
