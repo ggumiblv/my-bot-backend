@@ -72,7 +72,6 @@ bot.on('message', async (msg) => {
 //код на получение пост запроса
 app.post('/web-data', async (req, res) => {
   const { queryId, products, totalPrice } = req.body;
-  console.log(queryId);
 
   try {
     await bot.answerWebAppQuery(queryId, {
@@ -98,37 +97,34 @@ app.post('/web-data', async (req, res) => {
 });
 
 app.post('/auth', async (req, res) => {
-  const data = req.body;
   const { initData } = req.body;
   console.log('initData:', initData);
 
-  console.log('req:', req);
-
-  if (!data.hash || !data.id || !data.auth_date) {
+  if (!initData.hash || !initData.id || !initData.auth_date) {
     return res.status(400).json({ success: false, message: 'Invalid payload' });
   }
 
   const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
   const secretKey = crypto.createHash('sha256').update(BOT_TOKEN).digest();
-  const checkString = Object.keys(data)
+  const checkString = Object.keys(initData)
     .filter((key) => key !== 'hash')
     .sort()
-    .map((key) => `${key}=${data[key]}`)
+    .map((key) => `${key}=${initData[key]}`)
     .join('\n');
 
   const hash = crypto.createHmac('sha256', secretKey).update(checkString).digest('hex');
 
-  if (hash !== data.hash) {
+  if (hash !== initData.hash) {
     console.log('Invalid hash from Telegram');
     return res.status(403).json({ success: false, message: 'Invalid hash' });
   }
 
   const user = {
-    id: data.id,
-    first_name: data.first_name,
-    last_name: data.last_name,
-    username: data.username,
-    photo_url: data.photo_url
+    id: initData.id,
+    first_name: initData.first_name,
+    last_name: initData.last_name,
+    username: initData.username,
+    photo_url: initData.photo_url
   };
 
   // здесь можно добавить пользователя в БД
