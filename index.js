@@ -30,11 +30,11 @@ bot.on('message', async (msg) => {
   const text = msg.text;
 
   if (text === '/start') {
-    // await bot.sendMessage(chatId, 'Ниже появится кнопка, заполни форму', {
-    //   reply_markup: {
-    //     keyboard: [[{ text: 'Сделать заказ', web_app: { url: webAppURL + 'form' } }]]
-    //   }
-    // });
+    await bot.sendMessage(chatId, 'Ниже появится кнопка, заполни форму', {
+      reply_markup: {
+        keyboard: [[{ text: 'Сделать заказ', web_app: { url: webAppURL + 'form' } }]]
+      }
+    });
 
     await bot.sendMessage(chatId, 'Заходи в магазин', {
       reply_markup: {
