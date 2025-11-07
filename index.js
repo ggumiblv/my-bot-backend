@@ -103,39 +103,37 @@ app.post('/auth', async (req, res) => {
     return res.status(400).json({ success: false, error: 'No initData' });
   }
 
-  const params = Object.fromEntries(new URLSearchParams(initData));
-  console.log(params);
+  const params = Object.fromEntries(new URLSearchParams(initData)); //распарсили строку
 
-  const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
-  const secretKey = crypto.createHash('sha256').update(BOT_TOKEN).digest();
-  const checkString = Object.keys(initData)
-    .filter((key) => key !== 'hash')
+  const checkHash = params.hash; //выделяем хэш и удаляем его из данных
+  delete params.hash;
+
+  //собираем data-check-string
+  const dataCheckString = Object.keys(params)
     .sort()
-    .map((key) => `${key}=${initData[key]}`)
+    .map((key) => `${key}=${params[key]}`)
     .join('\n');
 
-  const hash = crypto.createHmac('sha256', secretKey).update(checkString).digest('hex');
+  //собираем secret_key
+  const secretKey = crypto.createHmac('sha256', 'WebAppData').update(BOT_TOKEN).digest();
 
-  if (hash !== initData.hash) {
-    console.log('Invalid hash from Telegram');
-    return res.status(403).json({ success: false, message: 'Invalid hash' });
+  //Считаем hash от data_check_string с использованием secret_key
+  const hmac = crypto.createHmac('sha256', secretKey).update(dataCheckString).digest('hex');
+
+  //Сравниваем хэши
+  if (hmac !== checkHash) {
+    return res.json({ success: false, error: 'Invalid hash' });
   }
 
-  const user = {
-    id: initData.id,
-    first_name: initData.first_name,
-    last_name: initData.last_name,
-    username: initData.username,
-    photo_url: initData.photo_url
-  };
+  // Проверим время (auth_date не старше часа)
+  const now = Math.floor(Date.now() / 1000);
+  if (now - Number(params.auth_date) > 3600) {
+    return res.json({ success: false, error: 'Auth data expired' });
+  }
 
-  // здесь можно добавить пользователя в БД
-  console.log('Auth successful:', user);
+  const user = JSON.parse(decodeURIComponent(params.user));
 
-  return res.status(200).json({
-    success: true,
-    user
-  });
+  res.json({ success: true, user });
 });
 
 app.listen(PORT, () => console.log('server started on PORT ' + PORT));
