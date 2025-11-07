@@ -18,7 +18,7 @@ const app = express();
 app.use(express.json());
 app.use(cors());
 
-//bot.setWebHook(`${SERVER_URL}/bot${token}`);
+bot.setWebHook(`${SERVER_URL}/bot${token}`);
 
 app.post(`/bot${token}`, (req, res) => {
   bot.processUpdate(req.body);
