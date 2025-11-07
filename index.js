@@ -115,7 +115,7 @@ app.post('/auth', async (req, res) => {
     .join('\n');
 
   //собираем secret_key
-  const secretKey = crypto.createHmac('sha256', 'WebAppData').update(BOT_TOKEN).digest();
+  const secretKey = crypto.createHmac('sha256', 'WebAppData').update(token).digest();
 
   //Считаем hash от data_check_string с использованием secret_key
   const hmac = crypto.createHmac('sha256', secretKey).update(dataCheckString).digest('hex');
