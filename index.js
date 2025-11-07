@@ -99,7 +99,10 @@ app.post('/web-data', async (req, res) => {
 
 app.post('/auth', async (req, res) => {
   const data = req.body;
-  console.log('Auth request:', data);
+  const { initData } = req.body;
+  console.log('initData:', initData);
+
+  console.log('req:', req);
 
   if (!data.hash || !data.id || !data.auth_date) {
     return res.status(400).json({ success: false, message: 'Invalid payload' });
