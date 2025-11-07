@@ -98,11 +98,13 @@ app.post('/web-data', async (req, res) => {
 
 app.post('/auth', async (req, res) => {
   const { initData } = req.body;
-  console.log('initData:', initData);
 
-  if (!initData.hash || !initData.id || !initData.auth_date) {
-    return res.status(400).json({ success: false, message: 'Invalid payload' });
+  if (!initData) {
+    return res.status(400).json({ success: false, error: 'No initData' });
   }
+
+  const params = Object.fromEntries(new URLSearchParams(initData));
+  console.log(params);
 
   const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
   const secretKey = crypto.createHash('sha256').update(BOT_TOKEN).digest();
