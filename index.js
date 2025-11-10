@@ -43,13 +43,13 @@ bot.on('message', async (msg) => {
     });
   }
 
-  if (text === '/login') {
-    await bot.sendMessage(chatId, 'Присоединяйся к нам!', {
-      reply_markup: {
-        inline_keyboard: [[{ text: 'Зарегистрироваться', web_app: { url: webAppURL + 'login' } }]]
-      }
-    });
-  }
+  // if (text === '/login') {
+  //   await bot.sendMessage(chatId, 'Присоединяйся к нам!', {
+  //     reply_markup: {
+  //       inline_keyboard: [[{ text: 'Зарегистрироваться', web_app: { url: webAppURL + 'login' } }]]
+  //     }
+  //   });
+  // }
 
   if (msg?.web_app_data?.data) {
     //получаем данные отправленные с веб приложения
@@ -107,6 +107,9 @@ app.post('/auth', async (req, res) => {
 
   const checkHash = params.hash; //выделяем хэш и удаляем его из данных
   delete params.hash;
+
+  const userId = params;
+  console.log(userId);
 
   //собираем data-check-string
   const dataCheckString = Object.keys(params)
