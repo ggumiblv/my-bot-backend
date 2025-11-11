@@ -38,41 +38,43 @@ app.post(`/bot${token}`, (req, res) => {
 // const db = client.db('bot_database');
 // const usersCollection = db.collection('users');
 
-async function run() {
-  try {
-    await client.connect();
-    console.log('Connected to MongoDB');
-  } catch (err) {
-    console.error('MongoDB connection error:', err);
-  }
-}
-run();
+// async function run() {
+//   try {
+//     await client.connect();
+//     console.log('Connected to MongoDB');
+//   } catch (err) {
+//     console.error('MongoDB connection error:', err);
+//   }
+// }
+// run();
 
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
   const text = msg.text;
 
   if (text === '/start') {
-    await bot.sendMessage(chatId, 'Ниже появится кнопка, заполни форму', {
+    await bot.sendMessage(chatId, 'Добро пожаловать в наш магазин! Загляните на наш сайт:', {
       reply_markup: {
-        keyboard: [[{ text: 'Заполни меня', web_app: { url: webAppURL + 'form' } }]]
-      }
-    });
-
-    await bot.sendMessage(chatId, 'Заходи в магазин', {
-      reply_markup: {
-        inline_keyboard: [[{ text: 'Сделать заказ', web_app: { url: webAppURL } }]]
+        inline_keyboard: [[{ text: 'Перейти на сайт', web_app: { url: webAppURL } }]]
       }
     });
   }
 
-  // if (text === '/login') {
-  //   await bot.sendMessage(chatId, 'Присоединяйся к нам!', {
-  //     reply_markup: {
-  //       inline_keyboard: [[{ text: 'Зарегистрироваться', web_app: { url: webAppURL + 'login' } }]]
-  //     }
-  //   });
-  // }
+  if (text === '/catalog') {
+    await bot.sendMessage(chatId, 'Здесь вы можете ознакомиться с нашим ассортиментом:', {
+      reply_markup: {
+        inline_keyboard: [[{ text: 'Открыть каталог', web_app: { url: webAppURL + 'catalog' } }]]
+      }
+    });
+  }
+
+  if (text === '/form') {
+    await bot.sendMessage(chatId, 'Поделитесь своими данными, чтобы оформить покупки быстрее:', {
+      reply_markup: {
+        keyboard: [[{ text: 'Заполнить данные', web_app: { url: webAppURL + 'form' } }]]
+      }
+    });
+  }
 
   if (msg?.web_app_data?.data) {
     //получаем данные отправленные с веб приложения
