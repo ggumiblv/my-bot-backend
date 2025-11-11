@@ -35,19 +35,18 @@ const client = new MongoClient(databaseUrl, {
   }
 });
 
+const db = client.db('bot_database');
+const usersCollection = db.collection('users');
+
 async function run() {
   try {
-    // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
-    // Send a ping to confirm a successful connection
-    await client.db('admin').command({ ping: 1 });
-    console.log('Pinged your deployment. You successfully connected to MongoDB!');
-  } finally {
-    // Ensures that the client will close when you finish/error
-    await client.close();
+    console.log('Connected to MongoDB');
+  } catch (err) {
+    console.error('MongoDB connection error:', err);
   }
 }
-run().catch(console.dir);
+run();
 
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
@@ -123,6 +122,10 @@ app.post('/web-data', async (req, res) => {
 app.post('/auth', async (req, res) => {
   const { initData } = req.body;
 
+  const telegramId = Number(req.params.telegramId);
+  const mongoUser = await usersCollection.findOne({ telegramId });
+  console.log('from database', mongoUser);
+
   if (!initData) {
     return res.status(400).json({ success: false, error: 'No initData' });
   }
@@ -156,6 +159,25 @@ app.post('/auth', async (req, res) => {
   }
 
   const user = JSON.parse(decodeURIComponent(params.user));
+
+  try {
+    const existingUser = await usersCollection.findOne({ telegramId: user.id });
+
+    if (!existingUser) {
+      await usersCollection.insertOne({
+        telegramId: user.id,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        username: user.username,
+        createdAt: new Date()
+      });
+      console.log('New user added:', user.username);
+    } else {
+      console.log('User already exists:', user.username);
+    }
+  } catch (err) {
+    console.error('Error saving user:', err);
+  }
 
   res.json({ success: true, user });
 });
