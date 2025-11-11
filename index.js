@@ -1,6 +1,7 @@
 require('dotenv').config();
 
 const TelegramBot = require('node-telegram-bot-api');
+const { MongoClient, ServerApiVersion } = require('mongodb');
 const express = require('express');
 const crypto = require('crypto');
 const cors = require('cors');
@@ -9,6 +10,7 @@ const token = process.env.TELEGRAM_BOT_TOKEN;
 const webAppURL = process.env.WEB_APP_URL;
 const PORT = process.env.PORT || 8000;
 const SERVER_URL = process.env.SERVER_URL;
+const databaseUrl = process.env.DATABASE_URL;
 
 //const bot = new TelegramBot(token, { polling: true });
 const bot = new TelegramBot(token);
@@ -24,6 +26,28 @@ app.post(`/bot${token}`, (req, res) => {
   bot.processUpdate(req.body);
   res.sendStatus(200);
 });
+
+const client = new MongoClient(databaseUrl, {
+  serverApi: {
+    version: ServerApiVersion.v1,
+    strict: true,
+    deprecationErrors: true
+  }
+});
+
+async function run() {
+  try {
+    // Connect the client to the server	(optional starting in v4.7)
+    await client.connect();
+    // Send a ping to confirm a successful connection
+    await client.db('admin').command({ ping: 1 });
+    console.log('Pinged your deployment. You successfully connected to MongoDB!');
+  } finally {
+    // Ensures that the client will close when you finish/error
+    await client.close();
+  }
+}
+run().catch(console.dir);
 
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
@@ -108,8 +132,6 @@ app.post('/auth', async (req, res) => {
   const checkHash = params.hash; //выделяем хэш и удаляем его из данных
   delete params.hash;
 
-  console.log('params', params);
-
   //собираем data-check-string
   const dataCheckString = Object.keys(params)
     .sort()
@@ -134,7 +156,6 @@ app.post('/auth', async (req, res) => {
   }
 
   const user = JSON.parse(decodeURIComponent(params.user));
-  console.log('user', user);
 
   res.json({ success: true, user });
 });
