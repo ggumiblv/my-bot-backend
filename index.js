@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 const TelegramBot = require('node-telegram-bot-api');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+//const { MongoClient, ServerApiVersion } = require('mongodb');
 const express = require('express');
 const crypto = require('crypto');
 const cors = require('cors');
@@ -10,7 +10,7 @@ const token = process.env.TELEGRAM_BOT_TOKEN;
 const webAppURL = process.env.WEB_APP_URL;
 const PORT = process.env.PORT || 8000;
 const SERVER_URL = process.env.SERVER_URL;
-const databaseUrl = process.env.DATABASE_URL;
+//const databaseUrl = process.env.DATABASE_URL;
 
 //const bot = new TelegramBot(token, { polling: true });
 const bot = new TelegramBot(token);
@@ -27,16 +27,16 @@ app.post(`/bot${token}`, (req, res) => {
   res.sendStatus(200);
 });
 
-const client = new MongoClient(databaseUrl, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true
-  }
-});
+// const client = new MongoClient(databaseUrl, {
+//   serverApi: {
+//     version: ServerApiVersion.v1,
+//     strict: true,
+//     deprecationErrors: true
+//   }
+// });
 
-const db = client.db('bot_database');
-const usersCollection = db.collection('users');
+// const db = client.db('bot_database');
+// const usersCollection = db.collection('users');
 
 async function run() {
   try {
@@ -122,9 +122,9 @@ app.post('/web-data', async (req, res) => {
 app.post('/auth', async (req, res) => {
   const { initData } = req.body;
 
-  const telegramId = Number(req.params.telegramId);
-  const mongoUser = await usersCollection.findOne({ telegramId });
-  console.log('from database', mongoUser);
+  // const telegramId = Number(req.params.telegramId);
+  // const mongoUser = await usersCollection.findOne({ telegramId });
+  // console.log('from database', mongoUser);
 
   if (!initData) {
     return res.status(400).json({ success: false, error: 'No initData' });
@@ -160,24 +160,24 @@ app.post('/auth', async (req, res) => {
 
   const user = JSON.parse(decodeURIComponent(params.user));
 
-  try {
-    const existingUser = await usersCollection.findOne({ telegramId: user.id });
+  // try {
+  //   const existingUser = await usersCollection.findOne({ telegramId: user.id });
 
-    if (!existingUser) {
-      await usersCollection.insertOne({
-        telegramId: user.id,
-        first_name: user.first_name,
-        last_name: user.last_name,
-        username: user.username,
-        createdAt: new Date()
-      });
-      console.log('New user added:', user.username);
-    } else {
-      console.log('User already exists:', user.username);
-    }
-  } catch (err) {
-    console.error('Error saving user:', err);
-  }
+  //   if (!existingUser) {
+  //     await usersCollection.insertOne({
+  //       telegramId: user.id,
+  //       first_name: user.first_name,
+  //       last_name: user.last_name,
+  //       username: user.username,
+  //       createdAt: new Date()
+  //     });
+  //     console.log('New user added:', user.username);
+  //   } else {
+  //     console.log('User already exists:', user.username);
+  //   }
+  // } catch (err) {
+  //   console.error('Error saving user:', err);
+  // }
 
   res.json({ success: true, user });
 });
