@@ -76,6 +76,14 @@ bot.on('message', async (msg) => {
     });
   }
 
+  if (text === '/test') {
+    await bot.sendMessage(chatId, 'Эта тестовая кнопка на случай, если авторизация не произошла', {
+      reply_markup: {
+        keyboard: [[{ text: 'Открыть приложение', web_app: { url: webAppURL } }]]
+      }
+    });
+  }
+
   if (msg?.web_app_data?.data) {
     //получаем данные отправленные с веб приложения
     try {
